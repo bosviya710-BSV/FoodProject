@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hotel Food Entry</title>
+  <style>
+    table, th, td { border:1px solid black; border-collapse: collapse; padding: 8px; }
+    th { background-color:#f2f2f2; }
+    input { margin:5px; }
+    button { cursor:pointer; }
+    #foodTable tr:nth-child(even){background-color:#f9f9f9;}
+  </style>
+</head>
+<body>
+
+<h2>Hotel Food Entry</h2>
+<form id="foodForm">
+  <input type="text" id="hotelName" placeholder="Hotel Name" required>
+  <input type="text" id="foodName" placeholder="Food Name" required>
+  <input type="number" id="quantity" placeholder="Quantity" min="1" required>
+  <input type="text" id="location" placeholder="Location" required>
+  <input type="text" id="time" placeholder="Time" readonly>
+  <button type="submit" style="background-color:green;color:white;">Post Food</button>
+</form>
+
+<input type="text" id="searchInput" placeholder="Search by Hotel/Food..." style="margin:10px;width:200px;">
+
+<h2>Food List</h2>
+<table id="foodTable">
+  <thead>
+    <tr>
+      <th>Hotel</th><th>Food</th><th>Quantity</th><th>Location</th><th>Time</th><th>Status</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+// Auto Time
+function setTime() {
+  document.getElementById("time").value = new Date().toLocaleDateString()+" - "+new Date().toLocaleTimeString();
+}
+window.onload = setTime;
+
+// Show Foods Table
+function showFoods(filter="") {
+  let foods = JSON.parse(localStorage.getItem("foods")) || [];
+  let table = document.querySelector("#foodTable tbody");
+  table.innerHTML = "";
+  foods.forEach(food => {
+    if(filter=="" || food.hotelName.toLowerCase().includes(filter.toLowerCase()) || food.foodName.toLowerCase().includes(filter.toLowerCase())) {
+      table.innerHTML += `<tr>
+        <td>${food.hotelName}</td>
+        <td>${food.foodName}</td>
+        <td>${food.quantity}</td>
+        <td>${food.location}</td>
+        <td>${food.time}</td>
+        <td>${food.claimed ? "Claimed by "+food.ngo : "Available"}</td>
+      </tr>`;
+    }
+  });
+}
+
+// Search
+document.getElementById("searchInput").addEventListener("input", function(){ showFoods(this.value); });
+
+// Form Submit
+document.getElementById("foodForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  let food = {
+    hotelName: document.getElementById("hotelName").value,
+    foodName: document.getElementById("foodName").value,
+    quantity: document.getElementById("quantity").value,
+    location: document.getElementById("location").value,
+    time: document.getElementById("time").value,
+    claimed:false,
+    ngo:""
+  };
+  let foods = JSON.parse(localStorage.getItem("foods")) || [];
+  foods.push(food);
+  localStorage.setItem("foods", JSON.stringify(foods));
+  alert("Food Posted Successfully!");
+  this.reset();
+  setTime();
+  showFoods();
+});
+
+showFoods();
+</script>
+
+</body>
+</html>

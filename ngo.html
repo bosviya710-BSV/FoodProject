@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NGO Food Claim</title>
+  <style>
+    table, th, td { border:1px solid black; border-collapse: collapse; padding: 8px; }
+    th { background-color: #f2f2f2; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h2>Available Food</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Hotel</th>
+      <th>Food</th>
+      <th>Quantity</th>
+      <th>Location</th>
+      <th>Time</th>
+      <th>NGO</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="ngoTable"></tbody>
+</table>
+
+<script>
+function showNGOFoods() {
+  let foods = JSON.parse(localStorage.getItem("foods")) || [];
+  let table = document.getElementById("ngoTable");
+  table.innerHTML = "";
+  foods.forEach((food, index) => {
+    if(!food.claimed) {
+      table.innerHTML += `
+        <tr>
+          <td>${food.hotelName}</td>
+          <td>${food.foodName}</td>
+          <td>${food.quantity}</td>
+          <td>${food.location}</td>
+          <td>${food.time}</td>
+          <td>${food.ngo}</td>
+          <td><button onclick="claimFood(${index})">Claim</button></td>
+        </tr>
+      `;
+    }
+  });
+}
+
+function claimFood(index) {
+  let foods = JSON.parse(localStorage.getItem("foods")) || [];
+  let ngoName = prompt("Enter NGO Name:");
+  if(!ngoName) return;
+  foods[index].claimed = true;
+  foods[index].ngo = ngoName;
+  localStorage.setItem("foods", JSON.stringify(foods));
+  alert("Food Claimed by " + ngoName);
+  showNGOFoods();
+}
+
+showNGOFoods();
+</script>
+
+</body>
+</html>
